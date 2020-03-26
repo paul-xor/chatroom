@@ -1,3 +1,4 @@
+/* jshint -W117*/
 const moment = require("moment");
 
 function formatMessage(username, text) {
