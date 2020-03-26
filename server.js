@@ -8,9 +8,9 @@ const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
-const botName = "ChatCord Bot";
-
 app.use(express.static(path.join(__dirname, "public")));
+
+const botName = "ChatCord Bot";
 
 //Run when client connects
 io.on("connection", socket => {
