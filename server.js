@@ -7,14 +7,15 @@ const formatMessage = require("./utils/messages");
 const {
   userJoin,
   getCurrentUser,
-  getRoomUsers,
-  userLeave
+  userLeave,
+  getRoomUsers
 } = require("./utils/users");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketio(server);
 
+// Set static folder
 app.use(express.static(path.join(__dirname, "public")));
 
 const botName = "ChatCord Bot";
@@ -35,12 +36,18 @@ io.on("connection", socket => {
         "message",
         formatMessage(botName, `${user.username} has joined the chat.`)
       );
+
+    //Send users an room info
+    io.to(user.room).emit("roomUsers", {
+      room: user.room,
+      users: getRoomUsers(user.room)
+    });
   });
 
   //Listen for chat message
   socket.on("chatMessage", msg => {
     const user = getCurrentUser(socket.id);
-    console.log(user.room);
+
     io.to(user.room).emit("message", formatMessage(user.username, msg));
   });
   //Runs when client disconnects
@@ -52,6 +59,12 @@ io.on("connection", socket => {
         "message",
         formatMessage(botName, `${user.username} has left the chat.`)
       );
+
+      // Send users and room info
+      io.to(user.room).emit("roomUsers", {
+        room: user.room,
+        users: getRoomUsers(user.room)
+      });
     }
   });
 });
